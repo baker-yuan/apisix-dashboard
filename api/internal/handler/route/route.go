@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package route
 
 import (
@@ -26,13 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gin-gonic/gin"
-	"github.com/shiningrush/droplet"
-	"github.com/shiningrush/droplet/data"
-	"github.com/shiningrush/droplet/wrapper"
-	wgin "github.com/shiningrush/droplet/wrapper/gin"
-	lua "github.com/yuin/gopher-lua"
-
 	"github.com/apisix/manager-api/internal/conf"
 	"github.com/apisix/manager-api/internal/core/entity"
 	"github.com/apisix/manager-api/internal/core/store"
@@ -40,6 +17,12 @@ import (
 	"github.com/apisix/manager-api/internal/log"
 	"github.com/apisix/manager-api/internal/utils"
 	"github.com/apisix/manager-api/internal/utils/consts"
+	"github.com/gin-gonic/gin"
+	"github.com/shiningrush/droplet"
+	"github.com/shiningrush/droplet/data"
+	"github.com/shiningrush/droplet/wrapper"
+	wgin "github.com/shiningrush/droplet/wrapper/gin"
+	lua "github.com/yuin/gopher-lua"
 )
 
 type Handler struct {
@@ -130,42 +113,44 @@ type GetInput struct {
 // produces:
 // - application/json
 // parameters:
-// - name: page
-//   in: query
-//   description: page number
-//   required: false
-//   type: integer
-// - name: page_size
-//   in: query
-//   description: page size
-//   required: false
-//   type: integer
-// - name: name
-//   in: query
-//   description: name of route
-//   required: false
-//   type: string
-// - name: uri
-//   in: query
-//   description: uri of route
-//   required: false
-//   type: string
-// - name: label
-//   in: query
-//   description: label of route
-//   required: false
-//   type: string
+//   - name: page
+//     in: query
+//     description: page number
+//     required: false
+//     type: integer
+//   - name: page_size
+//     in: query
+//     description: page size
+//     required: false
+//     type: integer
+//   - name: name
+//     in: query
+//     description: name of route
+//     required: false
+//     type: string
+//   - name: uri
+//     in: query
+//     description: uri of route
+//     required: false
+//     type: string
+//   - name: label
+//     in: query
+//     description: label of route
+//     required: false
+//     type: string
+//
 // responses:
-//   '0':
-//     description: list response
-//     schema:
-//       type: array
-//       items:
-//         "$ref": "#/definitions/route"
-//   default:
-//     description: unexpected error
-//     schema:
-//       "$ref": "#/definitions/ApiError"
+//
+//	'0':
+//	  description: list response
+//	  schema:
+//	    type: array
+//	    items:
+//	      "$ref": "#/definitions/route"
+//	default:
+//	  description: unexpected error
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
 func (h *Handler) Get(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*GetInput)
 
@@ -174,14 +159,14 @@ func (h *Handler) Get(c droplet.Context) (interface{}, error) {
 		return &data.SpecCodeResponse{StatusCode: http.StatusNotFound}, err
 	}
 
-	//format respond
+	// format respond
 	route := r.(*entity.Route)
 	script, _ := h.scriptStore.Get(c.Context(), input.ID)
 	if script != nil {
 		route.Script = script.(*entity.Script).Script
 	}
 
-	//format
+	// format
 	if route.Upstream != nil && route.Upstream.Nodes != nil {
 		route.Upstream.Nodes = entity.NodesFormat(route.Upstream.Nodes)
 	}
@@ -194,9 +179,9 @@ type ListInput struct {
 	URI    string `auto_read:"uri,query"`
 	Label  string `auto_read:"label,query"`
 	Status string `auto_read:"status,query"`
-	Host string `auto_read:"host,query"`
-	ID string `auto_read:"id,query"`
-	Desc string `auto_read:"desc,query"`
+	Host   string `auto_read:"host,query"`
+	ID     string `auto_read:"id,query"`
+	Desc   string `auto_read:"desc,query"`
 	store.Pagination
 }
 
@@ -270,7 +255,7 @@ func (h *Handler) List(c droplet.Context) (interface{}, error) {
 		return nil, err
 	}
 
-	//format respond
+	// format respond
 	var route *entity.Route
 	for i, item := range ret.Rows {
 		route = item.(*entity.Route)
@@ -324,7 +309,7 @@ func generateLuaCode(script map[string]interface{}) (string, error) {
 
 func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*entity.Route)
-	//check depend
+	// check depend
 	if input.ServiceID != nil {
 		serviceID := utils.InterfaceToString(input.ServiceID)
 		_, err := h.svcStore.Get(c.Context(), serviceID)
@@ -380,7 +365,7 @@ func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 			}
 		}
 
-		//save original conf
+		// save original conf
 		if _, err = h.scriptStore.Create(c.Context(), script); err != nil {
 			return nil, err
 		}
@@ -429,7 +414,7 @@ func (h *Handler) Update(c droplet.Context) (interface{}, error) {
 		input.Route.ID = input.ID
 	}
 
-	//check depend
+	// check depend
 	if input.ServiceID != nil {
 		serviceID := utils.InterfaceToString(input.ServiceID)
 		_, err := h.svcStore.Get(c.Context(), serviceID)
@@ -482,9 +467,9 @@ func (h *Handler) Update(c droplet.Context) (interface{}, error) {
 			}
 		}
 
-		//save original conf
+		// save original conf
 		if _, err = h.scriptStore.Update(c.Context(), script, true); err != nil {
-			//if not exists, create
+			// if not exists, create
 			if err.Error() == fmt.Sprintf("key: %s is not found", script.ID) {
 				if _, err := h.scriptStore.Create(c.Context(), script); err != nil {
 					return handler.SpecCodeResponse(err), err
@@ -503,7 +488,7 @@ func (h *Handler) Update(c droplet.Context) (interface{}, error) {
 			return &data.SpecCodeResponse{StatusCode: http.StatusBadRequest},
 				fmt.Errorf("script_id cannot be set if script is unset")
 		}
-		//remove exists script
+		// remove exists script
 		id := utils.InterfaceToString(input.Route.ID)
 		script, _ := h.scriptStore.Get(c.Context(), id)
 		if script != nil {
@@ -535,14 +520,14 @@ type BatchDelete struct {
 func (h *Handler) BatchDelete(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*BatchDelete)
 
-	//delete route
+	// delete route
 	if err := h.routeStore.BatchDelete(c.Context(), strings.Split(input.IDs, ",")); err != nil {
 		return handler.SpecCodeResponse(err), err
 	}
 
-	//delete stored script
+	// delete stored script
 	if err := h.scriptStore.BatchDelete(c.Context(), strings.Split(input.IDs, ",")); err != nil {
-		//try again
+		// try again
 		log.Warn("try to delete script %s again", input.IDs)
 		if err := h.scriptStore.BatchDelete(c.Context(), strings.Split(input.IDs, ",")); err != nil {
 			return nil, nil
@@ -565,25 +550,27 @@ type ExistCheckInput struct {
 // produces:
 // - application/json
 // parameters:
-// - name: name
-//   in: query
-//   description: name of route
-//   required: false
-//   type: string
-// - name: exclude
-//   in: query
-//   description: id of route that exclude checking
-//   required: false
-//   type: string
+//   - name: name
+//     in: query
+//     description: name of route
+//     required: false
+//     type: string
+//   - name: exclude
+//     in: query
+//     description: id of route that exclude checking
+//     required: false
+//     type: string
+//
 // responses:
-//   '0':
-//     description: route not exists
-//     schema:
-//       "$ref": "#/definitions/ApiError"
-//   default:
-//     description: unexpected error
-//     schema:
-//       "$ref": "#/definitions/ApiError"
+//
+//	'0':
+//	  description: route not exists
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
+//	default:
+//	  description: unexpected error
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
 func (h *Handler) Exist(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*ExistCheckInput)
 	name := input.Name

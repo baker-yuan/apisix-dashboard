@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package ssl
 
 import (
@@ -26,18 +10,17 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/gin-gonic/gin"
-	"github.com/shiningrush/droplet"
-	"github.com/shiningrush/droplet/data"
-	"github.com/shiningrush/droplet/wrapper"
-	wgin "github.com/shiningrush/droplet/wrapper/gin"
-
 	"github.com/apisix/manager-api/internal/conf"
 	"github.com/apisix/manager-api/internal/core/entity"
 	"github.com/apisix/manager-api/internal/core/store"
 	"github.com/apisix/manager-api/internal/handler"
 	"github.com/apisix/manager-api/internal/utils"
 	"github.com/apisix/manager-api/internal/utils/consts"
+	"github.com/gin-gonic/gin"
+	"github.com/shiningrush/droplet"
+	"github.com/shiningrush/droplet/data"
+	"github.com/shiningrush/droplet/wrapper"
+	wgin "github.com/shiningrush/droplet/wrapper/gin"
 )
 
 type Handler struct {
@@ -116,7 +99,7 @@ func (h *Handler) Get(c droplet.Context) (interface{}, error) {
 		return handler.SpecCodeResponse(err), err
 	}
 
-	//format respond
+	// format respond
 	ssl := &entity.SSL{}
 	err = utils.ObjectClone(ret, ssl)
 	if err != nil {
@@ -141,32 +124,34 @@ type ListInput struct {
 // produces:
 // - application/json
 // parameters:
-// - name: page
-//   in: query
-//   description: page number
-//   required: false
-//   type: integer
-// - name: page_size
-//   in: query
-//   description: page size
-//   required: false
-//   type: integer
-// - name: sni
-//   in: query
-//   description: sni of SSL
-//   required: false
-//   type: string
+//   - name: page
+//     in: query
+//     description: page number
+//     required: false
+//     type: integer
+//   - name: page_size
+//     in: query
+//     description: page size
+//     required: false
+//     type: integer
+//   - name: sni
+//     in: query
+//     description: sni of SSL
+//     required: false
+//     type: string
+//
 // responses:
-//   '0':
-//     description: list response
-//     schema:
-//       type: array
-//       items:
-//         "$ref": "#/definitions/ssl"
-//   default:
-//     description: unexpected error
-//     schema:
-//       "$ref": "#/definitions/ApiError"
+//
+//	'0':
+//	  description: list response
+//	  schema:
+//	    type: array
+//	    items:
+//	      "$ref": "#/definitions/ssl"
+//	default:
+//	  description: unexpected error
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
 func (h *Handler) List(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*ListInput)
 
@@ -193,7 +178,7 @@ func (h *Handler) List(c droplet.Context) (interface{}, error) {
 		return nil, err
 	}
 
-	//format respond
+	// format respond
 	var list []interface{}
 	for _, item := range ret.Rows {
 		ssl := &entity.SSL{}
@@ -219,7 +204,7 @@ func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 
 	ssl.ID = input.ID
 	ssl.Labels = input.Labels
-	//set default value for SSL status, if not set, it will be 0 which means disable.
+	// set default value for SSL status, if not set, it will be 0 which means disable.
 	ssl.Status = conf.SSLDefaultStatus
 	ret, err := h.sslStore.Create(c.Context(), ssl)
 	if err != nil {
@@ -259,7 +244,7 @@ func (h *Handler) Update(c droplet.Context) (interface{}, error) {
 		ssl.Labels = input.Labels
 	}
 
-	//set default value for SSL status, if not set, it will be 0 which means disable.
+	// set default value for SSL status, if not set, it will be 0 which means disable.
 	ssl.Status = conf.SSLDefaultStatus
 	ret, err := h.sslStore.Update(c.Context(), ssl, true)
 	if err != nil {
@@ -349,7 +334,7 @@ func ParseCert(crt, key string) (*entity.SSL, error) {
 	}
 
 	ssl := entity.SSL{}
-	//domain
+	// domain
 	snis := []string{}
 	if x509Cert.DNSNames != nil && len(x509Cert.DNSNames) > 0 {
 		snis = x509Cert.DNSNames
@@ -398,25 +383,27 @@ func ParseCert(crt, key string) (*entity.SSL, error) {
 // produces:
 // - application/json
 // parameters:
-// - name: cert
-//   in: body
-//   description: cert of SSL
-//   required: true
-//   type: string
-// - name: key
-//   in: body
-//   description: key of SSL
-//   required: true
-//   type: string
+//   - name: cert
+//     in: body
+//     description: cert of SSL
+//     required: true
+//     type: string
+//   - name: key
+//     in: body
+//     description: key of SSL
+//     required: true
+//     type: string
+//
 // responses:
-//   '0':
-//     description: SSL verify passed
-//     schema:
-//       "$ref": "#/definitions/ApiError"
-//   default:
-//     description: unexpected error
-//     schema:
-//       "$ref": "#/definitions/ApiError"
+//
+//	'0':
+//	  description: SSL verify passed
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
+//	default:
+//	  description: unexpected error
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
 func (h *Handler) Validate(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*entity.SSL)
 	ssl, err := ParseCert(input.Cert, input.Key)
@@ -453,22 +440,24 @@ type ExistCheckInput struct {
 // produces:
 // - application/json
 // parameters:
-// - name: hosts
-//   in: body
-//   description: hosts of Route
-//   required: true
-//   type: array
+//   - name: hosts
+//     in: body
+//     description: hosts of Route
+//     required: true
+//     type: array
 //     items:
 //     type: string
+//
 // responses:
-//   '0':
-//     description: SSL exists
-//     schema:
-//       "$ref": "#/definitions/ApiError"
-//   default:
-//     description: unexpected error
-//     schema:
-//       "$ref": "#/definitions/ApiError"
+//
+//	'0':
+//	  description: SSL exists
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
+//	default:
+//	  description: unexpected error
+//	  schema:
+//	    "$ref": "#/definitions/ApiError"
 func (h *Handler) Exist(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*ExistCheckInput)
 	if len(input.Hosts) == 0 {

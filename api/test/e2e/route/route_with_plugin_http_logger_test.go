@@ -1,29 +1,12 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package route_test
 
 import (
 	"net/http"
 	"time"
 
+	"github.com/apisix/manager-api/test/e2e/base"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-
-	"github.com/apisix/manager-api/test/e2e/base"
 )
 
 var _ = Describe("route with plugin http logger", func() {
@@ -88,7 +71,7 @@ var _ = Describe("route with plugin http logger", func() {
 		time.Sleep(1500 * time.Millisecond)
 
 		// verify http logger by checking log
-		//todo: should use a fake upstream for confirming whether we got the log data.
+		// todo: should use a fake upstream for confirming whether we got the log data.
 		logContent := base.ReadAPISIXErrorLog()
 		Expect(logContent).Should(ContainSubstring("Batch Processor[http logger] successfully processed the entries"))
 
@@ -146,7 +129,7 @@ var _ = Describe("route with plugin http logger", func() {
 		time.Sleep(1500 * time.Millisecond)
 
 		// verify http logger by checking log
-		//todo: should use a fake upstream for confirming whether we got the log data.
+		// todo: should use a fake upstream for confirming whether we got the log data.
 		logContent := base.ReadAPISIXErrorLog()
 		Expect(logContent).Should(ContainSubstring("Batch Processor[http logger] failed to process entries: failed to connect to host[127.0.0.1] port[8888] connection refused"))
 

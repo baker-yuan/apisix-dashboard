@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package base
 
 import (
@@ -160,11 +144,11 @@ type HttpTestCase struct {
 	ExpectBody    interface{}
 	UnexpectBody  interface{}
 	ExpectHeaders map[string]string
-	Sleep         time.Duration //ms
+	Sleep         time.Duration // ms
 }
 
 func RunTestCase(tc HttpTestCase) {
-	//init
+	// init
 	expectObj := tc.Object
 	var req *httpexpect.Request
 	switch tc.Method {
@@ -233,7 +217,7 @@ func RunTestCase(tc HttpTestCase) {
 
 	// match body
 	if tc.ExpectBody != nil {
-		//assert.Contains(t, []string{"string", "[]string"}, reflect.TypeOf(tc.ExpectBody).String())
+		// assert.Contains(t, []string{"string", "[]string"}, reflect.TypeOf(tc.ExpectBody).String())
 		if body, ok := tc.ExpectBody.(string); ok {
 			if body == "" {
 				// "" indicates the body is expected to be empty
@@ -250,7 +234,7 @@ func RunTestCase(tc HttpTestCase) {
 
 	// match UnexpectBody
 	if tc.UnexpectBody != nil {
-		//assert.Contains(t, []string{"string", "[]string"}, reflect.TypeOf(tc.UnexpectBody).String())
+		// assert.Contains(t, []string{"string", "[]string"}, reflect.TypeOf(tc.UnexpectBody).String())
 		if body, ok := tc.UnexpectBody.(string); ok {
 			// "" indicates the body is expected to be non empty
 			if body == "" {

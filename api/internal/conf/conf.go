@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package conf
 
 import (
@@ -25,12 +9,11 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/apisix/manager-api/internal/utils"
 	"github.com/gorilla/sessions"
 	"github.com/spf13/viper"
 	"github.com/tidwall/gjson"
 	"golang.org/x/oauth2"
-
-	"github.com/apisix/manager-api/internal/utils"
 )
 
 const (
@@ -63,7 +46,7 @@ var (
 	AccessLogPath    = "logs/access.log"
 	UserList         = make(map[string]User, 2)
 	AuthConf         Authentication
-	SSLDefaultStatus = 1 //enable ssl by default
+	SSLDefaultStatus = 1 // enable ssl by default
 	ImportSizeLimit  = 10 * 1024 * 1024
 	AllowList        []string
 	Plugins          = map[string]bool{}
@@ -174,7 +157,7 @@ func init() {
 }
 
 func InitConf() {
-	//go test
+	// go test
 	if workDir := os.Getenv("APISIX_API_WORKDIR"); workDir != "" {
 		WorkDir = workDir
 	}

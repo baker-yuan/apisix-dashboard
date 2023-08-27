@@ -1,19 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package data_loader
 
 import (
@@ -24,19 +8,18 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/getkin/kin-openapi/openapi3"
-	"github.com/gin-gonic/gin"
-	"github.com/shiningrush/droplet"
-	"github.com/shiningrush/droplet/data"
-	"github.com/shiningrush/droplet/wrapper"
-	wgin "github.com/shiningrush/droplet/wrapper/gin"
-
 	"github.com/apisix/manager-api/internal/core/entity"
 	"github.com/apisix/manager-api/internal/core/store"
 	"github.com/apisix/manager-api/internal/handler"
 	"github.com/apisix/manager-api/internal/log"
 	"github.com/apisix/manager-api/internal/utils"
 	"github.com/apisix/manager-api/internal/utils/consts"
+	"github.com/getkin/kin-openapi/openapi3"
+	"github.com/gin-gonic/gin"
+	"github.com/shiningrush/droplet"
+	"github.com/shiningrush/droplet/data"
+	"github.com/shiningrush/droplet/wrapper"
+	wgin "github.com/shiningrush/droplet/wrapper/gin"
 )
 
 type Handler struct {
@@ -65,7 +48,7 @@ type ExportInput struct {
 	IDs string `auto_read:"ids,path"`
 }
 
-//ExportRoutes Export data by passing route ID, such as "R1" or multiple route parameters, such as "R1,R2"
+// ExportRoutes Export data by passing route ID, such as "R1" or multiple route parameters, such as "R1,R2"
 func (h *Handler) ExportRoutes(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*ExportInput)
 
@@ -111,7 +94,7 @@ var (
 	_allHTTPMethods = []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodPatch, http.MethodHead, http.MethodConnect, http.MethodTrace, http.MethodOptions}
 )
 
-//ExportAllRoutes All routes can be directly exported without passing parameters
+// ExportAllRoutes All routes can be directly exported without passing parameters
 func (h *Handler) ExportAllRoutes(c droplet.Context) (interface{}, error) {
 	routelist, err := h.routeStore.List(c.Context(), store.ListInput{})
 
@@ -136,7 +119,7 @@ func (h *Handler) ExportAllRoutes(c droplet.Context) (interface{}, error) {
 	return swagger, nil
 }
 
-//RouteToOpenAPI3 Pass in route list parameter: []*entity.Route, convert route data to openapi3 and export processing function
+// RouteToOpenAPI3 Pass in route list parameter: []*entity.Route, convert route data to openapi3 and export processing function
 func (h *Handler) RouteToOpenAPI3(c droplet.Context, routes []*entity.Route) (*openapi3.Swagger, error) {
 	paths := openapi3.Paths{}
 	paramsRefs := []*openapi3.ParameterRef{}
@@ -171,7 +154,7 @@ func (h *Handler) RouteToOpenAPI3(c droplet.Context, routes []*entity.Route) (*o
 			serviceLabels = _service.Labels
 		}
 
-		//Parse upstream
+		// Parse upstream
 		_upstream, err := h.ParseRouteUpstream(c, route)
 
 		if err != nil {
@@ -189,7 +172,7 @@ func (h *Handler) RouteToOpenAPI3(c droplet.Context, routes []*entity.Route) (*o
 			extensions["x-apisix-hosts"] = route.Hosts
 		}
 
-		//Parse Labels
+		// Parse Labels
 		labels, err := ParseLabels(route, serviceLabels)
 		if err != nil {
 			log.Errorf("parseLabels err: ", err)
@@ -231,7 +214,7 @@ func (h *Handler) RouteToOpenAPI3(c droplet.Context, routes []*entity.Route) (*o
 		// Parse Route URIs
 		paths, paramsRefs = ParseRouteUris(route, paths, paramsRefs, pathItem, _pathNumber())
 
-		//Parse Route Plugins
+		// Parse Route Plugins
 		path, secSchemas, paramsRefs, plugins, err = ParseRoutePlugins(route, paramsRefs, plugins, path, servicePlugins, secSchemas, requestBody)
 
 		if err != nil {
@@ -291,8 +274,8 @@ func (h *Handler) RouteToOpenAPI3(c droplet.Context, routes []*entity.Route) (*o
 	return &swagger, nil
 }
 
-//ParseLabels When service and route have labels at the same time, use route's label.
-//When route has no label, service sometimes uses service's label. This function is used to process this logic
+// ParseLabels When service and route have labels at the same time, use route's label.
+// When route has no label, service sometimes uses service's label. This function is used to process this logic
 func ParseLabels(route *entity.Route, serviceLabels map[string]string) (map[string]string, error) {
 	if route.Labels != nil {
 		return route.Labels, nil
@@ -302,7 +285,7 @@ func ParseLabels(route *entity.Route, serviceLabels map[string]string) (map[stri
 	return nil, nil
 }
 
-//ParsePathItem Convert data in route to openapi3
+// ParsePathItem Convert data in route to openapi3
 func ParsePathItem(path openapi3.Operation, routeMethod string) *openapi3.Operation {
 	_path := &openapi3.Operation{
 		ExtensionProps: path.ExtensionProps,

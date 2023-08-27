@@ -1,20 +1,3 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package data_loader
 
 import (
@@ -33,7 +16,7 @@ import (
 // 1.Export data as the route of URIs Hosts
 func TestExportRoutes1(t *testing.T) {
 	input := &ExportInput{IDs: "1"}
-	//*entity.Route
+	// *entity.Route
 	r1 := `{
 		"name": "aaaa",
 		"labels": {
@@ -160,7 +143,7 @@ func TestExportRoutes1(t *testing.T) {
 // 2.Export data as the route of URI host
 func TestExportRoutes2(t *testing.T) {
 	input := &ExportInput{IDs: "1"}
-	//*entity.Route
+	// *entity.Route
 	r2 := `{
 		"name": "aaaa2",
 		"labels": {
@@ -287,7 +270,7 @@ func TestExportRoutes2(t *testing.T) {
 // 3.Create a service that contains complete data and use the service_id create route
 func TestExportRoutesCreateByServiceId(t *testing.T) {
 	input := &ExportInput{IDs: "1"}
-	//*entity.Route
+	// *entity.Route
 	r := `{
 				"methods": ["GET"],
 				"uri": "/hello",
@@ -393,7 +376,7 @@ func TestExportRoutesCreateByServiceId(t *testing.T) {
 // 4.Create a service containing plugin and a route containing plugin to test the fusion of exported data
 func TestExportRoutesCreateByServiceId2(t *testing.T) {
 	input := &ExportInput{IDs: "1"}
-	//*entity.Route
+	// *entity.Route
 	r := `{
 		"methods": ["GET"],
 		"uri": "/hello",
@@ -1102,7 +1085,8 @@ func TestExportRoutesCreateByLabel(t *testing.T) {
 }
 
 // 10.Create a service with label data and a route without label data, and export the route.
-//  Label is the data of the service
+//
+//	Label is the data of the service
 func TestExportRoutesCreateByLabel2(t *testing.T) {
 	input := &ExportInput{IDs: "1"}
 	s := `{
@@ -1480,7 +1464,7 @@ func TestExportRoutesCreateByKeyAuthAndBasicAuth(t *testing.T) {
 // 14.Export all routes
 func TestExportRoutesAll(t *testing.T) {
 	input := &store.ListInput{}
-	//*entity.Route
+	// *entity.Route
 	r1 := `{
 		"name": "aaaa",
 		"status": 1,
@@ -1598,7 +1582,7 @@ func TestExportRoutesAll(t *testing.T) {
 	assert.True(t, getCalled)
 }
 
-//15.Create service according to upstream1 ID
+// 15.Create service according to upstream1 ID
 // Create route according to upstream2 ID and service ID
 func TestExportRoutesCreateByUpstreamIDAndServiceID2(t *testing.T) {
 	input := &ExportInput{IDs: "1"}
@@ -1761,7 +1745,7 @@ func TestExportRoutesCreateByUpstreamIDAndServiceID2(t *testing.T) {
 // 16.Add suffix when testing the same URI export "APISIX-REPEAT-URI-" + Millisecond time stamp:  "APISIX-REPEAT-URI-1257894000000"
 func TestExportRoutesSameURI(t *testing.T) {
 	input := &store.ListInput{}
-	//*entity.Route
+	// *entity.Route
 	r1 := `{
 		"uris": ["/test-test"],
 		"name": "route_all",
@@ -1964,7 +1948,7 @@ func TestExportAllRoutesDataEmpty(t *testing.T) {
 
 func TestExportRoutesMethodsFeildEmpty(t *testing.T) {
 	input := &ExportInput{IDs: "1"}
-	//*entity.Route
+	// *entity.Route
 	r1 := `{
 		"uris": ["/test-test"],
 		"name": "route",
@@ -2182,7 +2166,7 @@ func TestExportRoutesMethodsFeildEmpty(t *testing.T) {
 
 func TestExportRoutesMethodsFeildNil(t *testing.T) {
 	input := &ExportInput{IDs: "1"}
-	//*entity.Route
+	// *entity.Route
 	r1 := `{
 		"uris": ["/test-test"],
 		"name": "route",
