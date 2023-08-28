@@ -7,6 +7,7 @@ import (
 	"github.com/apisix/manager-api/internal/utils"
 )
 
+// BaseInfo 公共属性
 type BaseInfo struct {
 	ID         interface{} `json:"id"`                    // ID
 	CreateTime int64       `json:"create_time,omitempty"` // 创建时间
@@ -71,7 +72,8 @@ type Route struct {
 	Vars []interface{} `json:"vars,omitempty"` //
 
 	// 插件
-	Plugins map[string]interface{} `json:"plugins,omitempty"` //
+	Plugins        map[string]interface{} `json:"plugins,omitempty"`          //
+	PluginConfigID interface{}            `json:"plugin_config_id,omitempty"` //
 
 	// 上游
 	Upstream   *UpstreamDef `json:"upstream,omitempty"`    //
@@ -81,25 +83,28 @@ type Route struct {
 	FilterFunc      string      `json:"filter_func,omitempty"`      //
 	Script          interface{} `json:"script,omitempty"`           //
 	ScriptID        interface{} `json:"script_id,omitempty"`        // For debug and optimization(cache), currently same as Route's ID
-	PluginConfigID  interface{} `json:"plugin_config_id,omitempty"` //
 	ServiceProtocol string      `json:"service_protocol,omitempty"` //
 }
 
 // --- structures for upstream start  ---
 
+// TimeoutValue 超时
 type TimeoutValue float32
+
+// Timeout 超时
 type Timeout struct {
-	Connect TimeoutValue `json:"connect,omitempty"`
-	Send    TimeoutValue `json:"send,omitempty"`
-	Read    TimeoutValue `json:"read,omitempty"`
+	Connect TimeoutValue `json:"connect,omitempty"` // 连接超时(建立从请求到上游服务器的连接的超时时间)
+	Send    TimeoutValue `json:"send,omitempty"`    // 发送超时(发送数据到上游服务器的超时时间)
+	Read    TimeoutValue `json:"read,omitempty"`    // 接收超时(从上游服务器接收数据的超时时间)
 }
 
+// Node 目标节点
 type Node struct {
-	Host     string      `json:"host,omitempty"`
-	Port     int         `json:"port,omitempty"`
-	Weight   int         `json:"weight"`
-	Metadata interface{} `json:"metadata,omitempty"`
-	Priority int         `json:"priority,omitempty"`
+	Host     string      `json:"host,omitempty"`     // 主机名
+	Port     int         `json:"port,omitempty"`     // 端口
+	Weight   int         `json:"weight"`             // 权重
+	Metadata interface{} `json:"metadata,omitempty"` //
+	Priority int         `json:"priority,omitempty"` //
 }
 
 type K8sInfo struct {
@@ -110,42 +115,47 @@ type K8sInfo struct {
 	BackendType string `json:"backend_type,omitempty"`
 }
 
+// Healthy 健康状态
 type Healthy struct {
-	Interval     int   `json:"interval,omitempty"`
-	HttpStatuses []int `json:"http_statuses,omitempty"`
-	Successes    int   `json:"successes,omitempty"`
+	Interval     int   `json:"interval,omitempty"`      // 间隔时间(对健康的上游服务目标节点进行主动健康检查的间隔时间（以秒为单位）。数值为0表示对健康节点不进行主动健康检查。)
+	Successes    int   `json:"successes,omitempty"`     // 成功次数(主动健康检查的 HTTP 成功次数，若达到此值，表示上游服务目标节点是健康的。)
+	HttpStatuses []int `json:"http_statuses,omitempty"` // 状态码(HTTP 状态码列表，当探针在主动健康检查中返回时，视为健康。)
 }
 
+// UnHealthy 不健康状态
 type UnHealthy struct {
-	Interval     int   `json:"interval,omitempty"`
-	HTTPStatuses []int `json:"http_statuses,omitempty"`
-	TCPFailures  int   `json:"tcp_failures,omitempty"`
-	Timeouts     int   `json:"timeouts,omitempty"`
-	HTTPFailures int   `json:"http_failures,omitempty"`
+	Timeouts     int   `json:"timeouts,omitempty"`      // 超时时间(活动探针中认为目标不健康的超时次数。)
+	Interval     int   `json:"interval,omitempty"`      // 间隔时间(对不健康目标的主动健康检查之间的间隔（以秒为单位）。数值为0表示不应该对健康目标进行主动探查。)
+	HTTPStatuses []int `json:"http_statuses,omitempty"` // 状态码
+	TCPFailures  int   `json:"tcp_failures,omitempty"`  // HTTP失败次数(主动健康检查的 HTTP 失败次数，默认值为0。若达到此值，表示上游服务目标节点是不健康的。)
+	HTTPFailures int   `json:"http_failures,omitempty"` // TCP失败次数(主动探测中 TCP 失败次数超过该值时，认为目标不健康。)
 }
 
+// Active 主动检查
 type Active struct {
-	Type                   string       `json:"type,omitempty"`
-	Timeout                TimeoutValue `json:"timeout,omitempty"`
-	Concurrency            int          `json:"concurrency,omitempty"`
-	Host                   string       `json:"host,omitempty"`
-	Port                   int          `json:"port,omitempty"`
-	HTTPPath               string       `json:"http_path,omitempty"`
-	HTTPSVerifyCertificate bool         `json:"https_verify_certificate,omitempty"`
-	Healthy                Healthy      `json:"healthy,omitempty"`
-	UnHealthy              UnHealthy    `json:"unhealthy,omitempty"`
-	ReqHeaders             []string     `json:"req_headers,omitempty"`
+	Type                   string       `json:"type,omitempty"`                     // 类型(是使用 HTTP 或 HTTPS 进行主动健康检查，还是只尝试 TCP 连接。)
+	Timeout                TimeoutValue `json:"timeout,omitempty"`                  // 超时时间(主动健康检查的套接字的超时时间)
+	Concurrency            int          `json:"concurrency,omitempty"`              // 并行数量(在主动健康检查中同时检查的目标数量。)
+	Host                   string       `json:"host,omitempty"`                     // 主机名(进行主动健康检查时使用的 HTTP 请求主机名)
+	Port                   int          `json:"port,omitempty"`                     // 端口
+	HTTPPath               string       `json:"http_path,omitempty"`                // 请求路径(向目标节点发出 HTTP GET 请求时应使用的路径。)
+	HTTPSVerifyCertificate bool         `json:"https_verify_certificate,omitempty"` //
+	ReqHeaders             []string     `json:"req_headers,omitempty"`              // 请求头
+	Healthy                Healthy      `json:"healthy,omitempty"`                  // 健康状态
+	UnHealthy              UnHealthy    `json:"unhealthy,omitempty"`                // 不健康状态
 }
 
+// Passive 被动检查(启用被动健康检查时，需要同时启用主动健康检查。)
 type Passive struct {
-	Type      string    `json:"type,omitempty"`
-	Healthy   Healthy   `json:"healthy,omitempty"`
-	UnHealthy UnHealthy `json:"unhealthy,omitempty"`
+	Type      string    `json:"type,omitempty"`      // 类型(是使用 HTTP 或 HTTPS 进行主动健康检查，还是只尝试 TCP 连接。)
+	Healthy   Healthy   `json:"healthy,omitempty"`   // 健康状态
+	UnHealthy UnHealthy `json:"unhealthy,omitempty"` // 不健康状态
 }
 
+// HealthChecker 健康检查
 type HealthChecker struct {
-	Active  Active  `json:"active,omitempty"`
-	Passive Passive `json:"passive,omitempty"`
+	Active  Active  `json:"active,omitempty"`  // 主动检查
+	Passive Passive `json:"passive,omitempty"` // 被动检查
 }
 
 type UpstreamTLS struct {
@@ -153,10 +163,11 @@ type UpstreamTLS struct {
 	ClientKey  string `json:"client_key,omitempty"`
 }
 
+// UpstreamKeepalivePool 连接池(为 upstream 对象设置独立的连接池)
 type UpstreamKeepalivePool struct {
-	IdleTimeout *TimeoutValue `json:"idle_timeout,omitempty"`
-	Requests    int           `json:"requests,omitempty"`
-	Size        int           `json:"size"`
+	IdleTimeout *TimeoutValue `json:"idle_timeout,omitempty"` // 容量
+	Requests    int           `json:"requests,omitempty"`     // 空闲超时时间
+	Size        int           `json:"size"`                   // 请求数量
 }
 
 // UpstreamDef 上游服务
@@ -164,25 +175,25 @@ type UpstreamDef struct {
 	Name          string                 `json:"name,omitempty"`           // 名称
 	Desc          string                 `json:"desc,omitempty"`           // 描述
 	Type          string                 `json:"type,omitempty"`           // 负载均衡算法
-	DiscoveryType string                 `json:"discovery_type,omitempty"` // 上游类型
+	DiscoveryType string                 `json:"discovery_type,omitempty"` // 上游类型 节点、服务发现
 	ServiceName   string                 `json:"service_name,omitempty"`   //
 	DiscoveryArgs map[string]string      `json:"discovery_args,omitempty"` //
 	Nodes         interface{}            `json:"nodes,omitempty"`          //
 	Retries       *int                   `json:"retries,omitempty"`        // 重试次数(重试机制将请求发到下一个上游节点。值为 0 表示禁用重试机制，留空表示使用可用后端节点的数量。)
-	Timeout       *Timeout               `json:"timeout,omitempty"`        // 重试超时时间(限制是否继续重试的时间，若之前的请求和重试请求花费太多时间就不再继续重试。0 代表不启用重试超时机制。)
+	RetryTimeout  TimeoutValue           `json:"retry_timeout,omitempty"`  // 重试超时时间(限制是否继续重试的时间，若之前的请求和重试请求花费太多时间就不再继续重试。0 代表不启用重试超时机制。)
 	Scheme        string                 `json:"scheme,omitempty"`         // 协议
-	Checks        interface{}            `json:"checks,omitempty"`         //
+	Timeout       *Timeout               `json:"timeout,omitempty"`        // 超时
+	KeepalivePool *UpstreamKeepalivePool `json:"keepalive_pool,omitempty"` // 连接池
+	Checks        interface{}            `json:"checks,omitempty"`         // 健康检查
 	HashOn        string                 `json:"hash_on,omitempty"`        //
 	Key           string                 `json:"key,omitempty"`            //
 	PassHost      string                 `json:"pass_host,omitempty"`      //
 	UpstreamHost  string                 `json:"upstream_host,omitempty"`  //
 	Labels        map[string]string      `json:"labels,omitempty"`         //
 	TLS           *UpstreamTLS           `json:"tls,omitempty"`            //
-	KeepalivePool *UpstreamKeepalivePool `json:"keepalive_pool,omitempty"` //
-	RetryTimeout  TimeoutValue           `json:"retry_timeout,omitempty"`  //
 }
 
-// swagger:model Upstream
+// swagger:model 上游
 type Upstream struct {
 	BaseInfo
 	UpstreamDef
@@ -237,16 +248,16 @@ type SSL struct {
 
 // swagger:model 服务
 type Service struct {
-	BaseInfo                               //
+	BaseInfo                               // 级别信息
 	Name            string                 `json:"name,omitempty"`             // 名称
 	Desc            string                 `json:"desc,omitempty"`             // 描述
-	Upstream        *UpstreamDef           `json:"upstream,omitempty"`         //
-	UpstreamID      interface{}            `json:"upstream_id,omitempty"`      //
-	Plugins         map[string]interface{} `json:"plugins,omitempty"`          //
+	Hosts           []string               `json:"hosts,omitempty"`            // 域名(路由匹配的域名列表。支持泛域名，如：*.test.com)
+	Upstream        *UpstreamDef           `json:"upstream,omitempty"`         // 上游
+	UpstreamID      interface{}            `json:"upstream_id,omitempty"`      // 上游ID
+	Plugins         map[string]interface{} `json:"plugins,omitempty"`          // 插件
 	Script          string                 `json:"script,omitempty"`           //
 	Labels          map[string]string      `json:"labels,omitempty"`           //
 	EnableWebsocket bool                   `json:"enable_websocket,omitempty"` //
-	Hosts           []string               `json:"hosts,omitempty"`            //
 }
 
 type Script struct {
