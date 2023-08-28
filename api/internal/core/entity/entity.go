@@ -8,9 +8,9 @@ import (
 )
 
 type BaseInfo struct {
-	ID         interface{} `json:"id"`
-	CreateTime int64       `json:"create_time,omitempty"`
-	UpdateTime int64       `json:"update_time,omitempty"`
+	ID         interface{} `json:"id"`                    // ID
+	CreateTime int64       `json:"create_time,omitempty"` // 创建时间
+	UpdateTime int64       `json:"update_time,omitempty"` // 更新时间
 }
 
 func (info *BaseInfo) GetBaseInfo() *BaseInfo {
@@ -44,35 +44,49 @@ func (info *BaseInfo) KeyCompat(key string) {
 
 type Status uint8
 
-// swagger:model Route
+// swagger:model 路由
 type Route struct {
 	BaseInfo
-	URI             string                 `json:"uri,omitempty"`
-	Uris            []string               `json:"uris,omitempty"`
-	Name            string                 `json:"name"`
-	Desc            string                 `json:"desc,omitempty"`
-	Priority        int                    `json:"priority,omitempty"`
-	Methods         []string               `json:"methods,omitempty"`
-	Host            string                 `json:"host,omitempty"`
-	Hosts           []string               `json:"hosts,omitempty"`
-	RemoteAddr      string                 `json:"remote_addr,omitempty"`
-	RemoteAddrs     []string               `json:"remote_addrs,omitempty"`
-	Vars            []interface{}          `json:"vars,omitempty"`
-	FilterFunc      string                 `json:"filter_func,omitempty"`
-	Script          interface{}            `json:"script,omitempty"`
-	ScriptID        interface{}            `json:"script_id,omitempty"` // For debug and optimization(cache), currently same as Route's ID
-	Plugins         map[string]interface{} `json:"plugins,omitempty"`
-	PluginConfigID  interface{}            `json:"plugin_config_id,omitempty"`
-	Upstream        *UpstreamDef           `json:"upstream,omitempty"`
-	ServiceID       interface{}            `json:"service_id,omitempty"`
-	UpstreamID      interface{}            `json:"upstream_id,omitempty"`
-	ServiceProtocol string                 `json:"service_protocol,omitempty"`
-	Labels          map[string]string      `json:"labels,omitempty"`
-	EnableWebsocket bool                   `json:"enable_websocket,omitempty"`
-	Status          Status                 `json:"status"`
+	// 基本信息
+	Name            string            `json:"name"`                       // 名称
+	Labels          map[string]string `json:"labels,omitempty"`           // 标签(为路由增加自定义标签，可用于路由分组。)
+	Desc            string            `json:"desc,omitempty"`             // 描述
+	ServiceID       interface{}       `json:"service_id,omitempty"`       //
+	EnableWebsocket bool              `json:"enable_websocket,omitempty"` // 允许WebSocket
+	Status          Status            `json:"status"`                     // 发布状态
+
+	// 匹配条件
+	Host        string   `json:"host,omitempty"`         // 域名(路由匹配的域名列表。支持泛域名，如：*.test.com)
+	Hosts       []string `json:"hosts,omitempty"`        //
+	URI         string   `json:"uri,omitempty"`          // 路径(HTTP 请求路径，如 /foo/index.html，支持请求路径前缀 /foo/*。/* 代表所有路径)
+	Uris        []string `json:"uris,omitempty"`         //
+	RemoteAddr  string   `json:"remote_addr,omitempty"`  // 客户端地址(客户端与服务器握手时 IP，即客户端 IP，例如：192.168.1.101，192.168.1.0/24，::1，fe80::1，fe80::1/64)
+	RemoteAddrs []string `json:"remote_addrs,omitempty"` //
+	Methods     []string `json:"methods,omitempty"`      // HTTP 方法
+	Priority    int      `json:"priority,omitempty"`     // 优先级
+
+	// 请求改写
+
+	// 高级匹配条件
+	Vars []interface{} `json:"vars,omitempty"` //
+
+	// 插件
+	Plugins map[string]interface{} `json:"plugins,omitempty"` //
+
+	// 上游
+	Upstream   *UpstreamDef `json:"upstream,omitempty"`    //
+	UpstreamID interface{}  `json:"upstream_id,omitempty"` //
+
+	// 其他
+	FilterFunc      string      `json:"filter_func,omitempty"`      //
+	Script          interface{} `json:"script,omitempty"`           //
+	ScriptID        interface{} `json:"script_id,omitempty"`        // For debug and optimization(cache), currently same as Route's ID
+	PluginConfigID  interface{} `json:"plugin_config_id,omitempty"` //
+	ServiceProtocol string      `json:"service_protocol,omitempty"` //
 }
 
 // --- structures for upstream start  ---
+
 type TimeoutValue float32
 type Timeout struct {
 	Connect TimeoutValue `json:"connect,omitempty"`
@@ -145,26 +159,27 @@ type UpstreamKeepalivePool struct {
 	Size        int           `json:"size"`
 }
 
+// UpstreamDef 上游服务
 type UpstreamDef struct {
-	Nodes         interface{}            `json:"nodes,omitempty"`
-	Retries       *int                   `json:"retries,omitempty"`
-	Timeout       *Timeout               `json:"timeout,omitempty"`
-	Type          string                 `json:"type,omitempty"`
-	Checks        interface{}            `json:"checks,omitempty"`
-	HashOn        string                 `json:"hash_on,omitempty"`
-	Key           string                 `json:"key,omitempty"`
-	Scheme        string                 `json:"scheme,omitempty"`
-	DiscoveryType string                 `json:"discovery_type,omitempty"`
-	DiscoveryArgs map[string]string      `json:"discovery_args,omitempty"`
-	PassHost      string                 `json:"pass_host,omitempty"`
-	UpstreamHost  string                 `json:"upstream_host,omitempty"`
-	Name          string                 `json:"name,omitempty"`
-	Desc          string                 `json:"desc,omitempty"`
-	ServiceName   string                 `json:"service_name,omitempty"`
-	Labels        map[string]string      `json:"labels,omitempty"`
-	TLS           *UpstreamTLS           `json:"tls,omitempty"`
-	KeepalivePool *UpstreamKeepalivePool `json:"keepalive_pool,omitempty"`
-	RetryTimeout  TimeoutValue           `json:"retry_timeout,omitempty"`
+	Name          string                 `json:"name,omitempty"`           // 名称
+	Desc          string                 `json:"desc,omitempty"`           // 描述
+	Type          string                 `json:"type,omitempty"`           // 负载均衡算法
+	DiscoveryType string                 `json:"discovery_type,omitempty"` // 上游类型
+	ServiceName   string                 `json:"service_name,omitempty"`   //
+	DiscoveryArgs map[string]string      `json:"discovery_args,omitempty"` //
+	Nodes         interface{}            `json:"nodes,omitempty"`          //
+	Retries       *int                   `json:"retries,omitempty"`        // 重试次数(重试机制将请求发到下一个上游节点。值为 0 表示禁用重试机制，留空表示使用可用后端节点的数量。)
+	Timeout       *Timeout               `json:"timeout,omitempty"`        // 重试超时时间(限制是否继续重试的时间，若之前的请求和重试请求花费太多时间就不再继续重试。0 代表不启用重试超时机制。)
+	Scheme        string                 `json:"scheme,omitempty"`         // 协议
+	Checks        interface{}            `json:"checks,omitempty"`         //
+	HashOn        string                 `json:"hash_on,omitempty"`        //
+	Key           string                 `json:"key,omitempty"`            //
+	PassHost      string                 `json:"pass_host,omitempty"`      //
+	UpstreamHost  string                 `json:"upstream_host,omitempty"`  //
+	Labels        map[string]string      `json:"labels,omitempty"`         //
+	TLS           *UpstreamTLS           `json:"tls,omitempty"`            //
+	KeepalivePool *UpstreamKeepalivePool `json:"keepalive_pool,omitempty"` //
+	RetryTimeout  TimeoutValue           `json:"retry_timeout,omitempty"`  //
 }
 
 // swagger:model Upstream
@@ -220,18 +235,18 @@ type SSL struct {
 	Client        *SSLClient        `json:"client,omitempty"`
 }
 
-// swagger:model Service
+// swagger:model 服务
 type Service struct {
-	BaseInfo
-	Name            string                 `json:"name,omitempty"`
-	Desc            string                 `json:"desc,omitempty"`
-	Upstream        *UpstreamDef           `json:"upstream,omitempty"`
-	UpstreamID      interface{}            `json:"upstream_id,omitempty"`
-	Plugins         map[string]interface{} `json:"plugins,omitempty"`
-	Script          string                 `json:"script,omitempty"`
-	Labels          map[string]string      `json:"labels,omitempty"`
-	EnableWebsocket bool                   `json:"enable_websocket,omitempty"`
-	Hosts           []string               `json:"hosts,omitempty"`
+	BaseInfo                               //
+	Name            string                 `json:"name,omitempty"`             // 名称
+	Desc            string                 `json:"desc,omitempty"`             // 描述
+	Upstream        *UpstreamDef           `json:"upstream,omitempty"`         //
+	UpstreamID      interface{}            `json:"upstream_id,omitempty"`      //
+	Plugins         map[string]interface{} `json:"plugins,omitempty"`          //
+	Script          string                 `json:"script,omitempty"`           //
+	Labels          map[string]string      `json:"labels,omitempty"`           //
+	EnableWebsocket bool                   `json:"enable_websocket,omitempty"` //
+	Hosts           []string               `json:"hosts,omitempty"`            //
 }
 
 type Script struct {
@@ -269,11 +284,11 @@ type PluginConfig struct {
 	Labels  map[string]string      `json:"labels,omitempty"`
 }
 
-// swagger:model Proto
+// swagger:model Proto文件
 type Proto struct {
-	BaseInfo
-	Desc    string `json:"desc,omitempty"`
-	Content string `json:"content"`
+	BaseInfo        //
+	Desc     string `json:"desc,omitempty"` // 描述
+	Content  string `json:"content"`        // 内容
 }
 
 // swagger:model StreamRoute

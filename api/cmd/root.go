@@ -26,9 +26,12 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
+	// 配置文件
 	rootCmd.PersistentFlags().StringVarP(&conf.ConfigFile, "config", "c", "", "config file")
+	// 工作目录
 	rootCmd.PersistentFlags().StringVarP(&conf.WorkDir, "work-dir", "p", ".", "current work directory")
 
+	//
 	rootCmd.AddCommand(
 		newVersionCommand(),
 	)
