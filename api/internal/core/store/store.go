@@ -51,11 +51,11 @@ type GenericStore struct {
 // GenericStoreOption 选项
 type GenericStoreOption struct {
 	BasePath   string                                            // 资源目录
-	ObjType    reflect.Type                                      //
+	ObjType    reflect.Type                                      // 模型对应的type
 	HubKey     HubKey                                            // 资源类型
 	KeyFunc    func(obj interface{}) string                      // 生成资源唯一key
+	Validator  Validator                                         // 数据校验，基于json schema，配置位置api/conf/schema.json
 	StockCheck func(obj interface{}, stockObj interface{}) error //
-	Validator  Validator                                         //
 }
 
 func NewGenericStore(opt GenericStoreOption) (*GenericStore, error) {

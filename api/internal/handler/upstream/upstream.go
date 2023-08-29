@@ -36,25 +36,16 @@ func NewHandler() (handler.RouteRegister, error) {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.GET("/apisix/admin/upstreams/:id", wgin.Wraps(h.Get,
-		wrapper.InputType(reflect.TypeOf(GetInput{}))))
-	r.GET("/apisix/admin/upstreams", wgin.Wraps(h.List,
-		wrapper.InputType(reflect.TypeOf(ListInput{}))))
-	r.POST("/apisix/admin/upstreams", wgin.Wraps(h.Create,
-		wrapper.InputType(reflect.TypeOf(entity.Upstream{}))))
-	r.PUT("/apisix/admin/upstreams", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.PUT("/apisix/admin/upstreams/:id", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.PATCH("/apisix/admin/upstreams/:id", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
-	r.PATCH("/apisix/admin/upstreams/:id/*path", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
-	r.DELETE("/apisix/admin/upstreams/:ids", wgin.Wraps(h.BatchDelete,
-		wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
+	r.GET("/apisix/admin/upstreams/:id", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
+	r.GET("/apisix/admin/upstreams", wgin.Wraps(h.List, wrapper.InputType(reflect.TypeOf(ListInput{}))))
+	r.POST("/apisix/admin/upstreams", wgin.Wraps(h.Create, wrapper.InputType(reflect.TypeOf(entity.Upstream{}))))
+	r.PUT("/apisix/admin/upstreams", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.PUT("/apisix/admin/upstreams/:id", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.PATCH("/apisix/admin/upstreams/:id", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.PATCH("/apisix/admin/upstreams/:id/*path", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.DELETE("/apisix/admin/upstreams/:ids", wgin.Wraps(h.BatchDelete, wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
 
-	r.GET("/apisix/admin/notexist/upstreams", wgin.Wraps(h.Exist,
-		wrapper.InputType(reflect.TypeOf(ExistCheckInput{}))))
+	r.GET("/apisix/admin/notexist/upstreams", wgin.Wraps(h.Exist, wrapper.InputType(reflect.TypeOf(ExistCheckInput{}))))
 
 	r.GET("/apisix/admin/names/upstreams", wgin.Wraps(h.listUpstreamNames))
 }

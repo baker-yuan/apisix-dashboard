@@ -42,27 +42,18 @@ func NewHandler() (handler.RouteRegister, error) {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.GET("/apisix/admin/routes/:id", wgin.Wraps(h.Get,
-		wrapper.InputType(reflect.TypeOf(GetInput{}))))
-	r.GET("/apisix/admin/routes", wgin.Wraps(h.List,
-		wrapper.InputType(reflect.TypeOf(ListInput{}))))
-	r.POST("/apisix/admin/routes", wgin.Wraps(h.Create,
-		wrapper.InputType(reflect.TypeOf(entity.Route{}))))
-	r.PUT("/apisix/admin/routes", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.PUT("/apisix/admin/routes/:id", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.GET("/apisix/admin/routes/:id", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
+	r.GET("/apisix/admin/routes", wgin.Wraps(h.List, wrapper.InputType(reflect.TypeOf(ListInput{}))))
+	r.POST("/apisix/admin/routes", wgin.Wraps(h.Create, wrapper.InputType(reflect.TypeOf(entity.Route{}))))
+	r.PUT("/apisix/admin/routes", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.PUT("/apisix/admin/routes/:id", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
 
-	r.DELETE("/apisix/admin/routes/:ids", wgin.Wraps(h.BatchDelete,
-		wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
+	r.DELETE("/apisix/admin/routes/:ids", wgin.Wraps(h.BatchDelete, wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
 
-	r.PATCH("/apisix/admin/routes/:id", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
-	r.PATCH("/apisix/admin/routes/:id/*path", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.PATCH("/apisix/admin/routes/:id", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.PATCH("/apisix/admin/routes/:id/*path", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
 
-	r.GET("/apisix/admin/notexist/routes", wgin.Wraps(h.Exist,
-		wrapper.InputType(reflect.TypeOf(ExistCheckInput{}))))
+	r.GET("/apisix/admin/notexist/routes", wgin.Wraps(h.Exist, wrapper.InputType(reflect.TypeOf(ExistCheckInput{}))))
 }
 
 type PatchInput struct {
@@ -154,6 +145,7 @@ type GetInput struct {
 func (h *Handler) Get(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*GetInput)
 
+	// 获取路由数据
 	r, err := h.routeStore.Get(c.Context(), input.ID)
 	if err != nil {
 		return &data.SpecCodeResponse{StatusCode: http.StatusNotFound}, err
@@ -309,7 +301,9 @@ func generateLuaCode(script map[string]interface{}) (string, error) {
 
 func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*entity.Route)
+
 	// check depend
+	// 检查关联的服务是否存在
 	if input.ServiceID != nil {
 		serviceID := utils.InterfaceToString(input.ServiceID)
 		_, err := h.svcStore.Get(c.Context(), serviceID)
@@ -321,6 +315,8 @@ func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 			return &data.SpecCodeResponse{StatusCode: http.StatusBadRequest}, err
 		}
 	}
+
+	// 检查关联的上游是否存在
 	if input.UpstreamID != nil {
 		upstreamID := utils.InterfaceToString(input.UpstreamID)
 		_, err := h.upstreamStore.Get(c.Context(), upstreamID)
@@ -333,12 +329,11 @@ func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 		}
 	}
 
+	// 检查脚本
 	// If route's script_id is set, it must be equals to the route's id.
 	if input.ScriptID != nil && (utils.InterfaceToString(input.ID) != utils.InterfaceToString(input.ScriptID)) {
-		return &data.SpecCodeResponse{StatusCode: http.StatusBadRequest},
-			fmt.Errorf("script_id must be the same as id")
+		return &data.SpecCodeResponse{StatusCode: http.StatusBadRequest}, fmt.Errorf("script_id must be the same as id")
 	}
-
 	if input.Script != nil {
 		if utils.InterfaceToString(input.ID) == "" {
 			input.ID = utils.GetFlakeUidStr()

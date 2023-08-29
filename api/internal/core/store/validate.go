@@ -53,12 +53,14 @@ func (v *JsonSchemaValidator) Validate(obj interface{}) error {
 	return nil
 }
 
+// APISIXJsonSchemaValidator json schema 校验 api/conf/schema.json
 type APISIXJsonSchemaValidator struct {
 	schema    *gojsonschema.Schema
 	schemaDef string
 }
 
 func NewAPISIXJsonSchemaValidator(jsonPath string) (Validator, error) {
+	// json schema 校验 api/conf/schema.json
 	schemaDef := conf.Schema.Get(jsonPath).String()
 	if schemaDef == "" {
 		log.Errorf("schema validate failed: schema not found, path: %s", jsonPath)

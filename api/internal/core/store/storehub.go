@@ -12,6 +12,7 @@ import (
 
 type HubKey string
 
+// https://apisix.apache.org/zh/docs/apisix/terminology/api-gateway/
 const (
 	HubKeyConsumer     HubKey = "consumer"
 	HubKeyRoute        HubKey = "route"
@@ -32,6 +33,7 @@ var (
 )
 
 func InitStore(key HubKey, opt GenericStoreOption) error {
+	// 那些资源需要检查
 	hubsNeedCheck := map[HubKey]bool{
 		HubKeyConsumer:     true,
 		HubKeyRoute:        true,
@@ -123,6 +125,7 @@ func InitStores() error {
 		return err
 	}
 
+	// 证书
 	err = InitStore(HubKeySsl, GenericStoreOption{
 		BasePath: conf.ETCDConfig.Prefix + "/ssls",
 		ObjType:  reflect.TypeOf(entity.SSL{}),
@@ -135,6 +138,7 @@ func InitStores() error {
 		return err
 	}
 
+	// 上游
 	err = InitStore(HubKeyUpstream, GenericStoreOption{
 		BasePath: conf.ETCDConfig.Prefix + "/upstreams",
 		ObjType:  reflect.TypeOf(entity.Upstream{}),
@@ -147,6 +151,7 @@ func InitStores() error {
 		return err
 	}
 
+	// 脚本
 	err = InitStore(HubKeyScript, GenericStoreOption{
 		BasePath: conf.ETCDConfig.Prefix + "/scripts",
 		ObjType:  reflect.TypeOf(entity.Script{}),
@@ -159,6 +164,7 @@ func InitStores() error {
 		return err
 	}
 
+	// 全局插件配置
 	err = InitStore(HubKeyGlobalRule, GenericStoreOption{
 		BasePath: conf.ETCDConfig.Prefix + "/global_rules",
 		ObjType:  reflect.TypeOf(entity.GlobalPlugins{}),
