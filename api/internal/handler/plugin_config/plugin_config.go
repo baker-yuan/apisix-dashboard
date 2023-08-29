@@ -32,22 +32,14 @@ func NewHandler() (handler.RouteRegister, error) {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.GET("/apisix/admin/plugin_configs/:id", wgin.Wraps(h.Get,
-		wrapper.InputType(reflect.TypeOf(GetInput{}))))
-	r.GET("/apisix/admin/plugin_configs", wgin.Wraps(h.List,
-		wrapper.InputType(reflect.TypeOf(ListInput{}))))
-	r.POST("/apisix/admin/plugin_configs", wgin.Wraps(h.Create,
-		wrapper.InputType(reflect.TypeOf(entity.PluginConfig{}))))
-	r.PUT("/apisix/admin/plugin_configs", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.PUT("/apisix/admin/plugin_configs/:id", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.PATCH("/apisix/admin/plugin_configs/:id", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
-	r.PATCH("/apisix/admin/plugin_configs/:id/*path", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
-	r.DELETE("/apisix/admin/plugin_configs/:ids", wgin.Wraps(h.BatchDelete,
-		wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
+	r.GET("/apisix/admin/plugin_configs/:id", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
+	r.GET("/apisix/admin/plugin_configs", wgin.Wraps(h.List, wrapper.InputType(reflect.TypeOf(ListInput{}))))
+	r.POST("/apisix/admin/plugin_configs", wgin.Wraps(h.Create, wrapper.InputType(reflect.TypeOf(entity.PluginConfig{}))))
+	r.PUT("/apisix/admin/plugin_configs", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.PUT("/apisix/admin/plugin_configs/:id", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.PATCH("/apisix/admin/plugin_configs/:id", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.PATCH("/apisix/admin/plugin_configs/:id/*path", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.DELETE("/apisix/admin/plugin_configs/:ids", wgin.Wraps(h.BatchDelete, wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
 }
 
 type GetInput struct {

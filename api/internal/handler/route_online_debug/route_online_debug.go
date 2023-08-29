@@ -32,8 +32,7 @@ type ProtocolSupport interface {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.POST("/apisix/admin/debug-request-forwarding", wgin.Wraps(h.DebugRequestForwarding,
-		wrapper.InputType(reflect.TypeOf(DebugOnlineInput{}))))
+	r.POST("/apisix/admin/debug-request-forwarding", wgin.Wraps(h.DebugRequestForwarding, wrapper.InputType(reflect.TypeOf(DebugOnlineInput{}))))
 }
 
 type DebugOnlineInput struct {

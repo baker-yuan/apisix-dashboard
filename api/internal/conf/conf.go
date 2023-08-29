@@ -260,7 +260,7 @@ func setupConfig() {
 	// set degree of parallelism
 	initParallelism(config.Conf.MaxCpu)
 
-	// set authentication
+	// 权限初始化 set authentication
 	initAuthentication(config.Authentication)
 
 	// set Oidc

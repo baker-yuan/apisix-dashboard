@@ -303,16 +303,18 @@ type Proto struct {
 }
 
 // swagger:model StreamRoute
+// https://apisix.apache.org/blog/2022/07/29/release-apache-apisix-2.15/#allow-collection-of-metrics-on-stream-route
+// https://blog.csdn.net/weixin_44917045/article/details/131835341
 type StreamRoute struct {
 	BaseInfo
-	Desc       string                 `json:"desc,omitempty"`
-	RemoteAddr string                 `json:"remote_addr,omitempty"`
-	ServerAddr string                 `json:"server_addr,omitempty"`
-	ServerPort int                    `json:"server_port,omitempty"`
-	SNI        string                 `json:"sni,omitempty"`
-	Upstream   *UpstreamDef           `json:"upstream,omitempty"`
-	UpstreamID interface{}            `json:"upstream_id,omitempty"`
-	Plugins    map[string]interface{} `json:"plugins,omitempty"`
+	Desc       string                 `json:"desc,omitempty"`        // 描述信息，用于描述这个StreamRoute的用途或其他信息。
+	RemoteAddr string                 `json:"remote_addr,omitempty"` // 远程地址，用于匹配客户端的IP地址或CIDR范围。
+	ServerAddr string                 `json:"server_addr,omitempty"` // 服务器地址，用于指定APISIX监听的地址。
+	ServerPort int                    `json:"server_port,omitempty"` // 服务器端口，用于指定APISIX监听的端口。
+	SNI        string                 `json:"sni,omitempty"`         // 用于TLS连接的Server Name Indication，用于匹配客户端的SNI。
+	Upstream   *UpstreamDef           `json:"upstream,omitempty"`    // 上游服务的定义，包括上游节点的地址和端口，以及负载均衡策略等。
+	UpstreamID interface{}            `json:"upstream_id,omitempty"` // 上游服务的ID，可以用来引用一个已经定义的上游服务。
+	Plugins    map[string]interface{} `json:"plugins,omitempty"`     // 插件的定义，用于在这个StreamRoute上启用一些插件，如限流插件、认证插件等。
 }
 
 // swagger:model SystemConfig

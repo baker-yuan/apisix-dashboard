@@ -33,22 +33,14 @@ func NewHandler() (handler.RouteRegister, error) {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.GET("/apisix/admin/services/:id", wgin.Wraps(h.Get,
-		wrapper.InputType(reflect.TypeOf(GetInput{}))))
-	r.GET("/apisix/admin/services", wgin.Wraps(h.List,
-		wrapper.InputType(reflect.TypeOf(ListInput{}))))
-	r.POST("/apisix/admin/services", wgin.Wraps(h.Create,
-		wrapper.InputType(reflect.TypeOf(entity.Service{}))))
-	r.PUT("/apisix/admin/services", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.PUT("/apisix/admin/services/:id", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.PATCH("/apisix/admin/services/:id", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
-	r.PATCH("/apisix/admin/services/:id/*path", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
-	r.DELETE("/apisix/admin/services/:ids", wgin.Wraps(h.BatchDelete,
-		wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
+	r.GET("/apisix/admin/services/:id", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
+	r.GET("/apisix/admin/services", wgin.Wraps(h.List, wrapper.InputType(reflect.TypeOf(ListInput{}))))
+	r.POST("/apisix/admin/services", wgin.Wraps(h.Create, wrapper.InputType(reflect.TypeOf(entity.Service{}))))
+	r.PUT("/apisix/admin/services", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.PUT("/apisix/admin/services/:id", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.PATCH("/apisix/admin/services/:id", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.PATCH("/apisix/admin/services/:id/*path", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.DELETE("/apisix/admin/services/:ids", wgin.Wraps(h.BatchDelete, wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
 }
 
 type GetInput struct {
@@ -152,6 +144,7 @@ func (h *Handler) List(c droplet.Context) (interface{}, error) {
 func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*entity.Service)
 
+	// 检查上游服务
 	if input.UpstreamID != nil {
 		upstreamID := utils.InterfaceToString(input.UpstreamID)
 		_, err := h.upstreamStore.Get(c.Context(), upstreamID)

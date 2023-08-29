@@ -22,38 +22,40 @@ var (
 	storeNeedReInit = make([]*GenericStore, 0)
 )
 
+// Pagination 分页查询
 type Pagination struct {
-	PageSize   int `json:"page_size" form:"page_size" auto_read:"page_size"`
-	PageNumber int `json:"page" form:"page" auto_read:"page"`
+	PageSize   int `json:"page_size" form:"page_size" auto_read:"page_size"` // 页码
+	PageNumber int `json:"page" form:"page" auto_read:"page"`                // 页面大小
 }
 
+// Interface 存储接口
 type Interface interface {
-	Type() HubKey
-	Get(ctx context.Context, key string) (interface{}, error)
-	List(ctx context.Context, input ListInput) (*ListOutput, error)
-	Create(ctx context.Context, obj interface{}) (interface{}, error)
-	Update(ctx context.Context, obj interface{}, createIfNotExist bool) (interface{}, error)
+	Type() HubKey                                                                            //
+	Get(ctx context.Context, key string) (interface{}, error)                                //
+	List(ctx context.Context, input ListInput) (*ListOutput, error)                          // 列表查询
+	Create(ctx context.Context, obj interface{}) (interface{}, error)                        // 创建
+	Update(ctx context.Context, obj interface{}, createIfNotExist bool) (interface{}, error) // 批量删除
 	BatchDelete(ctx context.Context, keys []string) error
 }
 
+// GenericStore 通用存储
 type GenericStore struct {
-	Stg      storage.Interface
-	initLock sync.Mutex
-
-	cache sync.Map
-	opt   GenericStoreOption
-
-	cancel  context.CancelFunc
-	closing bool
+	Stg      storage.Interface  // 底层存储层操作
+	opt      GenericStoreOption // 选项
+	cache    sync.Map           // 缓存底层数据到内存，后续直接操作内存
+	cancel   context.CancelFunc // 用于取消数据监听(监听数据同步内存)，GenericStore#watch
+	initLock sync.Mutex         // GenericStore#Init加锁
+	closing  bool               // GenericStore#Close调用标识
 }
 
+// GenericStoreOption 选项
 type GenericStoreOption struct {
-	BasePath   string
-	ObjType    reflect.Type
-	KeyFunc    func(obj interface{}) string
-	StockCheck func(obj interface{}, stockObj interface{}) error
-	Validator  Validator
-	HubKey     HubKey
+	BasePath   string                                            // 资源目录
+	ObjType    reflect.Type                                      // 模型对应的type
+	HubKey     HubKey                                            // 资源类型
+	KeyFunc    func(obj interface{}) string                      // 生成资源唯一key
+	Validator  Validator                                         // 数据校验，基于json schema，配置位置api/conf/schema.json
+	StockCheck func(obj interface{}, stockObj interface{}) error //
 }
 
 func NewGenericStore(opt GenericStoreOption) (*GenericStore, error) {
@@ -80,6 +82,7 @@ func NewGenericStore(opt GenericStoreOption) (*GenericStore, error) {
 	s := &GenericStore{
 		opt: opt,
 	}
+	// 底层存储基于etcd
 	s.Stg = storage.GenEtcdStorage()
 
 	return s, nil
@@ -104,6 +107,7 @@ func (s *GenericStore) Type() HubKey {
 	return s.opt.HubKey
 }
 
+// Get 单个查询
 func (s *GenericStore) Get(_ context.Context, key string) (interface{}, error) {
 	ret, ok := s.cache.Load(key)
 	if !ok {
@@ -113,15 +117,16 @@ func (s *GenericStore) Get(_ context.Context, key string) (interface{}, error) {
 	return ret, nil
 }
 
+// ListInput 列表查询条件
 type ListInput struct {
-	Predicate func(obj interface{}) bool
-	Format    func(obj interface{}) interface{}
-	PageSize  int
-	// start from 1
-	PageNumber int
-	Less       func(i, j interface{}) bool
+	Predicate  func(obj interface{}) bool        // 条件
+	Format     func(obj interface{}) interface{} //
+	PageSize   int                               // 页码
+	PageNumber int                               // 页面大小 start from 1
+	Less       func(i, j interface{}) bool       //
 }
 
+// ListOutput 列表查询返回
 type ListOutput struct {
 	Rows      []interface{} `json:"rows"`
 	TotalSize int           `json:"total_size"`
@@ -132,6 +137,7 @@ func NewListOutput() *ListOutput {
 	return &ListOutput{Rows: make([]interface{}, 0)}
 }
 
+// defLessFunc 列表排序
 var defLessFunc = func(i, j interface{}) bool {
 	iBase := i.(entity.GetBaseInfo).GetBaseInfo()
 	jBase := j.(entity.GetBaseInfo).GetBaseInfo()
@@ -146,8 +152,11 @@ var defLessFunc = func(i, j interface{}) bool {
 	return iID < jID
 }
 
+// List 列表查询
 func (s *GenericStore) List(_ context.Context, input ListInput) (*ListOutput, error) {
 	var ret []interface{}
+
+	// 遍历缓存
 	s.cache.Range(func(key, value interface{}) bool {
 		if input.Predicate != nil && !input.Predicate(value) {
 			return true
@@ -159,30 +168,33 @@ func (s *GenericStore) List(_ context.Context, input ListInput) (*ListOutput, er
 		return true
 	})
 
+	// 数据为空返回空数组
 	// should return an empty array not a null for client
 	if ret == nil {
 		ret = []interface{}{}
 	}
 
+	// 组装返回数据
 	output := &ListOutput{
 		Rows:      ret,
 		TotalSize: len(ret),
 	}
+
+	// 排序
 	if input.Less == nil {
 		input.Less = defLessFunc
 	}
-
 	sort.Slice(output.Rows, func(i, j int) bool {
 		return input.Less(output.Rows[i], output.Rows[j])
 	})
 
+	// 分页
 	if input.PageSize > 0 && input.PageNumber > 0 {
 		skipCount := (input.PageNumber - 1) * input.PageSize
 		if skipCount > output.TotalSize {
 			output.Rows = []interface{}{}
 			return output, nil
 		}
-
 		endIdx := skipCount + input.PageSize
 		if endIdx >= output.TotalSize {
 			output.Rows = ret[skipCount:]
@@ -201,6 +213,7 @@ func (s *GenericStore) Range(_ context.Context, f func(key string, obj interface
 }
 
 func (s *GenericStore) ingestValidate(obj interface{}) (err error) {
+	// 校验 json schema
 	if s.opt.Validator != nil {
 		if err := s.opt.Validator.Validate(obj); err != nil {
 			log.Errorf("data validate failed: %s, %v", err, obj)
@@ -255,11 +268,13 @@ func (s *GenericStore) Create(ctx context.Context, obj interface{}) (interface{}
 		info.Creating()
 	}
 
+	// 检查
 	bytes, err := s.CreateCheck(obj)
 	if err != nil {
 		return nil, err
 	}
 
+	// 调用底层存储保存数据
 	if err := s.Stg.Create(ctx, s.GetObjStorageKey(obj), string(bytes)); err != nil {
 		return nil, err
 	}
@@ -313,9 +328,12 @@ func (s *GenericStore) BatchDelete(ctx context.Context, keys []string) error {
 	return s.Stg.BatchDelete(ctx, storageKeys)
 }
 
+// listAndWatch 全量获取数据，并且开始监听数据变化，存储到本地缓存s.cache里面
 func (s *GenericStore) listAndWatch() error {
 	lc, lcancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer lcancel()
+
+	// 全量获取数据缓存到本地
 	ret, err := s.Stg.List(lc, s.opt.BasePath)
 	if err != nil {
 		return err
@@ -327,18 +345,20 @@ func (s *GenericStore) listAndWatch() error {
 			_, _ = fmt.Fprintf(os.Stderr, "Error occurred while initializing logical store: %s, err: %v", s.opt.BasePath, err)
 			return err
 		}
-
 		s.cache.Store(s.opt.KeyFunc(objPtr), objPtr)
 	}
 
-	// start watch
+	// 监听增量数据变化 start watch
 	s.cancel = s.watch()
 
 	return nil
 }
 
+// watch 监听底层数据变化
 func (s *GenericStore) watch() context.CancelFunc {
+	// 取消watch
 	c, cancel := context.WithCancel(context.TODO())
+	// watch底层数据
 	ch := s.Stg.Watch(c, s.opt.BasePath)
 	go func() {
 		defer func() {
@@ -354,6 +374,7 @@ func (s *GenericStore) watch() context.CancelFunc {
 				return
 			}
 
+			// 维护本地缓存
 			for i := range event.Events {
 				switch event.Events[i].Type {
 				case storage.EventTypePut:

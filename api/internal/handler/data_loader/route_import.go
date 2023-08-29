@@ -48,8 +48,7 @@ func NewImportHandler() (handler.RouteRegister, error) {
 }
 
 func (h *ImportHandler) ApplyRoute(r *gin.Engine) {
-	r.POST("/apisix/admin/import/routes", wgin.Wraps(h.Import,
-		wrapper.InputType(reflect.TypeOf(ImportInput{}))))
+	r.POST("/apisix/admin/import/routes", wgin.Wraps(h.Import, wrapper.InputType(reflect.TypeOf(ImportInput{}))))
 }
 
 type ImportResult struct {

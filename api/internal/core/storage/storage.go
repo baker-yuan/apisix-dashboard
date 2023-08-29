@@ -11,25 +11,29 @@ type Interface interface {
 	Watch(ctx context.Context, key string) <-chan WatchResponse
 }
 
+// WatchResponse Watch方法通道传输的数据
 type WatchResponse struct {
 	Events   []Event
 	Error    error
 	Canceled bool
 }
 
+// Keypair 数据
 type Keypair struct {
-	Key   string
-	Value string
+	Key   string // 目录
+	Value string // 值
 }
 
+// Event 事件
 type Event struct {
-	Keypair
-	Type EventType
+	Keypair           // 数据
+	Type    EventType // 事件类型
 }
 
+// EventType 事件类型
 type EventType string
 
 var (
-	EventTypePut    EventType = "put"
-	EventTypeDelete EventType = "delete"
+	EventTypePut    EventType = "put"    // 新增、修改
+	EventTypeDelete EventType = "delete" // 删除
 )

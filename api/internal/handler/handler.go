@@ -17,6 +17,7 @@
 //	- application/xml
 //
 // swagger:meta
+
 package handler
 
 import (
@@ -125,9 +126,7 @@ func NameExistCheck(ctx context.Context, stg store.Interface, resource, name str
 		return &data.SpecCodeResponse{StatusCode: http.StatusInternalServerError}, err
 	}
 	if ret.TotalSize > 0 {
-		return &data.SpecCodeResponse{StatusCode: http.StatusBadRequest},
-			fmt.Errorf("%s name exists", resource)
+		return &data.SpecCodeResponse{StatusCode: http.StatusBadRequest}, fmt.Errorf("%s name exists", resource)
 	}
-
 	return nil, nil
 }

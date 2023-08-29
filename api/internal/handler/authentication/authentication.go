@@ -22,8 +22,7 @@ func NewHandler() (handler.RouteRegister, error) {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.POST("/apisix/admin/user/login", wgin.Wraps(h.userLogin,
-		wrapper.InputType(reflect.TypeOf(LoginInput{}))))
+	r.POST("/apisix/admin/user/login", wgin.Wraps(h.userLogin, wrapper.InputType(reflect.TypeOf(LoginInput{}))))
 }
 
 type UserSession struct {
@@ -72,6 +71,7 @@ func (h *Handler) userLogin(c droplet.Context) (interface{}, error) {
 	username := input.Username
 	password := input.Password
 
+	// /api/conf/conf.yaml#users
 	user := conf.UserList[username]
 	if username != user.Username || password != user.Password {
 		return nil, consts.ErrUsernamePassword

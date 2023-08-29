@@ -28,22 +28,15 @@ func NewHandler() (handler.RouteRegister, error) {
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
 	// global plugins
-	r.GET("/apisix/admin/global_rules/:id", wgin.Wraps(h.Get,
-		wrapper.InputType(reflect.TypeOf(GetInput{}))))
-	r.GET("/apisix/admin/global_rules", wgin.Wraps(h.List,
-		wrapper.InputType(reflect.TypeOf(ListInput{}))))
-	r.PUT("/apisix/admin/global_rules/:id", wgin.Wraps(h.Set,
-		wrapper.InputType(reflect.TypeOf(SetInput{}))))
-	r.PUT("/apisix/admin/global_rules", wgin.Wraps(h.Set,
-		wrapper.InputType(reflect.TypeOf(SetInput{}))))
+	r.GET("/apisix/admin/global_rules/:id", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
+	r.GET("/apisix/admin/global_rules", wgin.Wraps(h.List, wrapper.InputType(reflect.TypeOf(ListInput{}))))
+	r.PUT("/apisix/admin/global_rules/:id", wgin.Wraps(h.Set, wrapper.InputType(reflect.TypeOf(SetInput{}))))
+	r.PUT("/apisix/admin/global_rules", wgin.Wraps(h.Set, wrapper.InputType(reflect.TypeOf(SetInput{}))))
 
-	r.PATCH("/apisix/admin/global_rules/:id", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
-	r.PATCH("/apisix/admin/global_rules/:id/*path", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.PATCH("/apisix/admin/global_rules/:id", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.PATCH("/apisix/admin/global_rules/:id/*path", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
 
-	r.DELETE("/apisix/admin/global_rules/:id", wgin.Wraps(h.BatchDelete,
-		wrapper.InputType(reflect.TypeOf(BatchDeleteInput{}))))
+	r.DELETE("/apisix/admin/global_rules/:id", wgin.Wraps(h.BatchDelete, wrapper.InputType(reflect.TypeOf(BatchDeleteInput{}))))
 }
 
 type GetInput struct {

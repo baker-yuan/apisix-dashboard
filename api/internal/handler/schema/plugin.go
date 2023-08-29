@@ -19,8 +19,7 @@ func NewHandler() (handler.RouteRegister, error) {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.GET("/apisix/admin/plugins", wgin.Wraps(h.Plugins,
-		wrapper.InputType(reflect.TypeOf(ListInput{}))))
+	r.GET("/apisix/admin/plugins", wgin.Wraps(h.Plugins, wrapper.InputType(reflect.TypeOf(ListInput{}))))
 }
 
 type ListInput struct {
