@@ -24,14 +24,10 @@ func NewHandler() (handler.RouteRegister, error) {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.GET("/apisix/admin/system_config/:config_name", wgin.Wraps(h.Get,
-		wrapper.InputType(reflect.TypeOf(GetInput{}))))
-	r.POST("/apisix/admin/system_config", wgin.Wraps(h.Post,
-		wrapper.InputType(reflect.TypeOf(entity.SystemConfig{}))))
-	r.PUT("/apisix/admin/system_config", wgin.Wraps(h.Put,
-		wrapper.InputType(reflect.TypeOf(entity.SystemConfig{}))))
-	r.DELETE("/apisix/admin/system_config/:config_name", wgin.Wraps(h.Delete,
-		wrapper.InputType(reflect.TypeOf(DeleteInput{}))))
+	r.GET("/apisix/admin/system_config/:config_name", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
+	r.POST("/apisix/admin/system_config", wgin.Wraps(h.Post, wrapper.InputType(reflect.TypeOf(entity.SystemConfig{}))))
+	r.PUT("/apisix/admin/system_config", wgin.Wraps(h.Put, wrapper.InputType(reflect.TypeOf(entity.SystemConfig{}))))
+	r.DELETE("/apisix/admin/system_config/:config_name", wgin.Wraps(h.Delete, wrapper.InputType(reflect.TypeOf(DeleteInput{}))))
 }
 
 type GetInput struct {

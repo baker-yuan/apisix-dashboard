@@ -39,8 +39,7 @@ func NewHandler() (handler.RouteRegister, error) {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.GET("/apisix/admin/export/routes/:ids", wgin.Wraps(h.ExportRoutes,
-		wrapper.InputType(reflect.TypeOf(ExportInput{}))))
+	r.GET("/apisix/admin/export/routes/:ids", wgin.Wraps(h.ExportRoutes, wrapper.InputType(reflect.TypeOf(ExportInput{}))))
 	r.GET("/apisix/admin/export/routes", wgin.Wraps(h.ExportAllRoutes))
 }
 

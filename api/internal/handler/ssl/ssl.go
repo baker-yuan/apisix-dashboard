@@ -63,28 +63,18 @@ func checkSniExists(rows []interface{}, sni string) bool {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.GET("/apisix/admin/ssl/:id", wgin.Wraps(h.Get,
-		wrapper.InputType(reflect.TypeOf(GetInput{}))))
-	r.GET("/apisix/admin/ssl", wgin.Wraps(h.List,
-		wrapper.InputType(reflect.TypeOf(ListInput{}))))
-	r.POST("/apisix/admin/ssl", wgin.Wraps(h.Create,
-		wrapper.InputType(reflect.TypeOf(entity.SSL{}))))
-	r.PUT("/apisix/admin/ssl", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.PUT("/apisix/admin/ssl/:id", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.DELETE("/apisix/admin/ssl/:ids", wgin.Wraps(h.BatchDelete,
-		wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
-	r.POST("/apisix/admin/check_ssl_cert", wgin.Wraps(h.Validate,
-		wrapper.InputType(reflect.TypeOf(entity.SSL{}))))
+	r.GET("/apisix/admin/ssl/:id", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
+	r.GET("/apisix/admin/ssl", wgin.Wraps(h.List, wrapper.InputType(reflect.TypeOf(ListInput{}))))
+	r.POST("/apisix/admin/ssl", wgin.Wraps(h.Create, wrapper.InputType(reflect.TypeOf(entity.SSL{}))))
+	r.PUT("/apisix/admin/ssl", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.PUT("/apisix/admin/ssl/:id", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.DELETE("/apisix/admin/ssl/:ids", wgin.Wraps(h.BatchDelete, wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
+	r.POST("/apisix/admin/check_ssl_cert", wgin.Wraps(h.Validate, wrapper.InputType(reflect.TypeOf(entity.SSL{}))))
 
-	r.PATCH("/apisix/admin/ssl/:id", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
-	r.PATCH("/apisix/admin/ssl/:id/*path", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.PATCH("/apisix/admin/ssl/:id", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.PATCH("/apisix/admin/ssl/:id/*path", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
 
-	r.POST("/apisix/admin/check_ssl_exists", wgin.Wraps(h.Exist,
-		wrapper.InputType(reflect.TypeOf(ExistCheckInput{}))))
+	r.POST("/apisix/admin/check_ssl_exists", wgin.Wraps(h.Exist, wrapper.InputType(reflect.TypeOf(ExistCheckInput{}))))
 }
 
 type GetInput struct {

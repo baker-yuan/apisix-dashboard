@@ -213,6 +213,7 @@ func (s *GenericStore) Range(_ context.Context, f func(key string, obj interface
 }
 
 func (s *GenericStore) ingestValidate(obj interface{}) (err error) {
+	// 校验 json schema
 	if s.opt.Validator != nil {
 		if err := s.opt.Validator.Validate(obj); err != nil {
 			log.Errorf("data validate failed: %s, %v", err, obj)

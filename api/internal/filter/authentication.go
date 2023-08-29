@@ -10,7 +10,7 @@ import (
 	"github.com/golang-jwt/jwt"
 )
 
-// http://127.0.0.1:9000/apisix/admin/tool/version
+// Authentication http://127.0.0.1:9000/apisix/admin/tool/version
 func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.URL.Path == "/apisix/admin/user/login" ||

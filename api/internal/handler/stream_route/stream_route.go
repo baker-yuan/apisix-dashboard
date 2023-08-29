@@ -30,18 +30,12 @@ func NewHandler() (handler.RouteRegister, error) {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.GET("/apisix/admin/stream_routes/:id", wgin.Wraps(h.Get,
-		wrapper.InputType(reflect.TypeOf(GetInput{}))))
-	r.GET("/apisix/admin/stream_routes", wgin.Wraps(h.List,
-		wrapper.InputType(reflect.TypeOf(ListInput{}))))
-	r.POST("/apisix/admin/stream_routes", wgin.Wraps(h.Create,
-		wrapper.InputType(reflect.TypeOf(entity.StreamRoute{}))))
-	r.PUT("/apisix/admin/stream_routes", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.PUT("/apisix/admin/stream_routes/:id", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.DELETE("/apisix/admin/stream_routes/:ids", wgin.Wraps(h.BatchDelete,
-		wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
+	r.GET("/apisix/admin/stream_routes/:id", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
+	r.GET("/apisix/admin/stream_routes", wgin.Wraps(h.List, wrapper.InputType(reflect.TypeOf(ListInput{}))))
+	r.POST("/apisix/admin/stream_routes", wgin.Wraps(h.Create, wrapper.InputType(reflect.TypeOf(entity.StreamRoute{}))))
+	r.PUT("/apisix/admin/stream_routes", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.PUT("/apisix/admin/stream_routes/:id", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.DELETE("/apisix/admin/stream_routes/:ids", wgin.Wraps(h.BatchDelete, wrapper.InputType(reflect.TypeOf(BatchDelete{}))))
 }
 
 type GetInput struct {
@@ -72,19 +66,15 @@ func (h *Handler) List(c droplet.Context) (interface{}, error) {
 			if input.RemoteAddr != "" && !strings.Contains(obj.(*entity.StreamRoute).RemoteAddr, input.RemoteAddr) {
 				return false
 			}
-
 			if input.ServerAddr != "" && !strings.Contains(obj.(*entity.StreamRoute).ServerAddr, input.ServerAddr) {
 				return false
 			}
-
 			if input.ServerPort != 0 && obj.(*entity.StreamRoute).ServerPort != input.ServerPort {
 				return false
 			}
-
 			if input.SNI != "" && !strings.Contains(obj.(*entity.StreamRoute).SNI, input.SNI) {
 				return false
 			}
-
 			return true
 		},
 		PageSize:   input.PageSize,
@@ -99,17 +89,19 @@ func (h *Handler) List(c droplet.Context) (interface{}, error) {
 
 func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 	streamRoute := c.Input().(*entity.StreamRoute)
+
+	// 上游服务ID
 	if streamRoute.UpstreamID != nil {
 		upstreamID := utils.InterfaceToString(streamRoute.UpstreamID)
 		_, err := h.upstreamStore.Get(c.Context(), upstreamID)
 		if err != nil {
 			if err == data.ErrNotFound {
-				return &data.SpecCodeResponse{StatusCode: http.StatusBadRequest},
-					fmt.Errorf("upstream id: %s not found", streamRoute.UpstreamID)
+				return &data.SpecCodeResponse{StatusCode: http.StatusBadRequest}, fmt.Errorf("upstream id: %s not found", streamRoute.UpstreamID)
 			}
 			return handler.SpecCodeResponse(err), err
 		}
 	}
+
 	create, err := h.streamRouteStore.Create(c.Context(), streamRoute)
 	if err != nil {
 		return handler.SpecCodeResponse(err), err
@@ -140,12 +132,12 @@ func (h *Handler) Update(c droplet.Context) (interface{}, error) {
 		_, err := h.upstreamStore.Get(c.Context(), upstreamID)
 		if err != nil {
 			if err == data.ErrNotFound {
-				return &data.SpecCodeResponse{StatusCode: http.StatusBadRequest},
-					fmt.Errorf("upstream id: %s not found", input.UpstreamID)
+				return &data.SpecCodeResponse{StatusCode: http.StatusBadRequest}, fmt.Errorf("upstream id: %s not found", input.UpstreamID)
 			}
 			return &data.SpecCodeResponse{StatusCode: http.StatusBadRequest}, err
 		}
 	}
+
 	res, err := h.streamRouteStore.Update(c.Context(), &input.StreamRoute, true)
 	if err != nil {
 		return handler.SpecCodeResponse(err), err

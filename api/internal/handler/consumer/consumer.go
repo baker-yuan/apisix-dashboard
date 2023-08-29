@@ -25,16 +25,11 @@ func NewHandler() (handler.RouteRegister, error) {
 }
 
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.GET("/apisix/admin/consumers/:username", wgin.Wraps(h.Get,
-		wrapper.InputType(reflect.TypeOf(GetInput{}))))
-	r.GET("/apisix/admin/consumers", wgin.Wraps(h.List,
-		wrapper.InputType(reflect.TypeOf(ListInput{}))))
-	r.PUT("/apisix/admin/consumers/:username", wgin.Wraps(h.Set,
-		wrapper.InputType(reflect.TypeOf(SetInput{}))))
-	r.PUT("/apisix/admin/consumers", wgin.Wraps(h.Set,
-		wrapper.InputType(reflect.TypeOf(SetInput{}))))
-	r.DELETE("/apisix/admin/consumers/:usernames", wgin.Wraps(h.BatchDelete,
-		wrapper.InputType(reflect.TypeOf(BatchDeleteInput{}))))
+	r.GET("/apisix/admin/consumers/:username", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
+	r.GET("/apisix/admin/consumers", wgin.Wraps(h.List, wrapper.InputType(reflect.TypeOf(ListInput{}))))
+	r.PUT("/apisix/admin/consumers/:username", wgin.Wraps(h.Set, wrapper.InputType(reflect.TypeOf(SetInput{}))))
+	r.PUT("/apisix/admin/consumers", wgin.Wraps(h.Set, wrapper.InputType(reflect.TypeOf(SetInput{}))))
+	r.DELETE("/apisix/admin/consumers/:usernames", wgin.Wraps(h.BatchDelete, wrapper.InputType(reflect.TypeOf(BatchDeleteInput{}))))
 }
 
 type GetInput struct {
