@@ -40,31 +40,26 @@ func NewHandler() (handler.RouteRegister, error) {
 	}, nil
 }
 
+// ApplyRoute 注册路由
 func (h *Handler) ApplyRoute(r *gin.Engine) {
-	r.GET("/apisix/admin/proto/:id", wgin.Wraps(h.Get,
-		wrapper.InputType(reflect.TypeOf(GetInput{}))))
-	r.GET("/apisix/admin/proto", wgin.Wraps(h.List,
-		wrapper.InputType(reflect.TypeOf(ListInput{}))))
-	r.POST("/apisix/admin/proto", wgin.Wraps(h.Create,
-		wrapper.InputType(reflect.TypeOf(entity.Proto{}))))
-	r.PUT("/apisix/admin/proto", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.PUT("/apisix/admin/proto/:id", wgin.Wraps(h.Update,
-		wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
-	r.PATCH("/apisix/admin/proto/:id", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
-	r.PATCH("/apisix/admin/proto/:id/*path", wgin.Wraps(h.Patch,
-		wrapper.InputType(reflect.TypeOf(PatchInput{}))))
-	r.DELETE("/apisix/admin/proto/:ids", wgin.Wraps(h.BatchDelete,
-		wrapper.InputType(reflect.TypeOf(BatchDeleteInput{}))))
+	r.GET("/apisix/admin/proto/:id", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
+	r.GET("/apisix/admin/proto", wgin.Wraps(h.List, wrapper.InputType(reflect.TypeOf(ListInput{}))))
+	r.POST("/apisix/admin/proto", wgin.Wraps(h.Create, wrapper.InputType(reflect.TypeOf(entity.Proto{}))))
+	r.PUT("/apisix/admin/proto", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.PUT("/apisix/admin/proto/:id", wgin.Wraps(h.Update, wrapper.InputType(reflect.TypeOf(UpdateInput{}))))
+	r.PATCH("/apisix/admin/proto/:id", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.PATCH("/apisix/admin/proto/:id/*path", wgin.Wraps(h.Patch, wrapper.InputType(reflect.TypeOf(PatchInput{}))))
+	r.DELETE("/apisix/admin/proto/:ids", wgin.Wraps(h.BatchDelete, wrapper.InputType(reflect.TypeOf(BatchDeleteInput{}))))
 }
 
 var plugins = []string{"grpc-transcode"}
 
+// GetInput 根据ID查询
 type GetInput struct {
 	ID string `auto_read:"id,path" validate:"required"`
 }
 
+// Get 根据ID查询入参
 func (h *Handler) Get(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*GetInput)
 
@@ -76,11 +71,13 @@ func (h *Handler) Get(c droplet.Context) (interface{}, error) {
 	return r, nil
 }
 
+// ListInput 列表查询入参
 type ListInput struct {
 	Desc string `auto_read:"desc,query"`
 	store.Pagination
 }
 
+// List 列表查询
 func (h *Handler) List(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*ListInput)
 
@@ -101,6 +98,7 @@ func (h *Handler) List(c droplet.Context) (interface{}, error) {
 	return ret, nil
 }
 
+// Create 创建
 func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*entity.Proto)
 
@@ -125,11 +123,13 @@ func (h *Handler) Create(c droplet.Context) (interface{}, error) {
 	return ret, nil
 }
 
+// UpdateInput 修改入参
 type UpdateInput struct {
 	ID string `auto_read:"id,path"`
 	entity.Proto
 }
 
+// Update 修改
 func (h *Handler) Update(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*UpdateInput)
 
@@ -186,10 +186,12 @@ func (h *Handler) Patch(c droplet.Context) (interface{}, error) {
 	return ret, nil
 }
 
+// BatchDeleteInput 批量删除入参
 type BatchDeleteInput struct {
 	IDs string `auto_read:"ids,path"`
 }
 
+// BatchDelete 批量删除
 func (h *Handler) BatchDelete(c droplet.Context) (interface{}, error) {
 	input := c.Input().(*BatchDeleteInput)
 

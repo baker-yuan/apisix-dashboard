@@ -28,7 +28,7 @@ const (
 )
 
 var (
-	etcdClient *clientv3.Client
+	etcdClient *clientv3.Client // etcd客户端，InitETCDClient初始化赋值
 )
 
 type EtcdV3Storage struct {
@@ -83,6 +83,7 @@ func Close() error {
 	return nil
 }
 
+// Get 根据key查找
 func (s *EtcdV3Storage) Get(ctx context.Context, key string) (string, error) {
 	resp, err := s.client.Get(ctx, key)
 	if err != nil {
@@ -93,7 +94,6 @@ func (s *EtcdV3Storage) Get(ctx context.Context, key string) (string, error) {
 		log.Warnf("key: %s is not found", key)
 		return "", fmt.Errorf("key: %s is not found", key)
 	}
-
 	return string(resp.Kvs[0].Value), nil
 }
 
@@ -172,6 +172,7 @@ func (s *EtcdV3Storage) Watch(ctx context.Context, key string) <-chan WatchRespo
 				return
 			}
 
+			// 构建通道传输的数据
 			output := WatchResponse{
 				Canceled: event.Canceled,
 			}
@@ -213,6 +214,7 @@ func (s *EtcdV3Storage) Watch(ctx context.Context, key string) <-chan WatchRespo
 		close(ch)
 	}()
 
+	// 返回通道
 	return ch
 }
 

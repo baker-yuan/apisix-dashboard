@@ -84,6 +84,7 @@ func RangeStore(f func(key HubKey, store *GenericStore) bool) {
 }
 
 func InitStores() error {
+	// 消费者
 	err := InitStore(HubKeyConsumer, GenericStoreOption{
 		BasePath: conf.ETCDConfig.Prefix + "/consumers",
 		ObjType:  reflect.TypeOf(entity.Consumer{}),
@@ -96,6 +97,7 @@ func InitStores() error {
 		return err
 	}
 
+	// 路由
 	err = InitStore(HubKeyRoute, GenericStoreOption{
 		BasePath: conf.ETCDConfig.Prefix + "/routes",
 		ObjType:  reflect.TypeOf(entity.Route{}),
@@ -108,6 +110,7 @@ func InitStores() error {
 		return err
 	}
 
+	// 服务
 	err = InitStore(HubKeyService, GenericStoreOption{
 		BasePath: conf.ETCDConfig.Prefix + "/services",
 		ObjType:  reflect.TypeOf(entity.Service{}),
