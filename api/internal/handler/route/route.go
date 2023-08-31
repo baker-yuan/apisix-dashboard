@@ -43,6 +43,14 @@ func NewHandler() (handler.RouteRegister, error) {
 
 // ApplyRoute https://apisix.apache.org/zh/docs/apisix/admin-api/#route
 func (h *Handler) ApplyRoute(r *gin.Engine) {
+	// 名称		请求 URI								请求 body	描述
+	//GET		/apisix/admin/routes				无			获取资源列表。
+	//GET		/apisix/admin/routes/{id}			无			获取资源。
+	//PUT		/apisix/admin/routes/{id}			{...}		根据 id 创建资源。
+	//POST		/apisix/admin/routes				{...}		创建资源，id 将会自动生成。
+	//DELETE	/apisix/admin/routes/{id}			无			删除指定资源。
+	//PATCH		/apisix/admin/routes/{id}			{...}		标准 PATCH，修改指定 Route 的部分属性，其他不涉及的属性会原样保留；如果你需要删除某个属性，可以将该属性的值设置为 null；当需要修改属性的值为数组时，该属性将全量更新。
+	//PATCH		/apisix/admin/routes/{id}/{path}	{...}		SubPath PATCH，通过 {path} 指定 Route 要更新的属性，全量更新该属性的数据，其他不涉及的属性会原样保留。两种 PATCH 的区别，请参考使用示例。
 	r.GET("/apisix/admin/routes/:id", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
 	r.GET("/apisix/admin/routes", wgin.Wraps(h.List, wrapper.InputType(reflect.TypeOf(ListInput{}))))
 	r.POST("/apisix/admin/routes", wgin.Wraps(h.Create, wrapper.InputType(reflect.TypeOf(entity.Route{}))))

@@ -49,10 +49,10 @@ type Status uint8
 type Route struct {
 	BaseInfo
 	// 基本信息
-	Name            string            `json:"name"`                       // 名称
+	Name            string            `json:"name"`                       // 路由名称
 	Labels          map[string]string `json:"labels,omitempty"`           // 标签(为路由增加自定义标签，可用于路由分组。)
-	Desc            string            `json:"desc,omitempty"`             // 描述
-	ServiceID       interface{}       `json:"service_id,omitempty"`       //
+	Desc            string            `json:"desc,omitempty"`             // 路由描述信息
+	ServiceID       interface{}       `json:"service_id,omitempty"`       // 需要绑定的 Service id
 	EnableWebsocket bool              `json:"enable_websocket,omitempty"` // 允许WebSocket
 	Status          Status            `json:"status"`                     // 发布状态
 
