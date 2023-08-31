@@ -41,6 +41,7 @@ func NewHandler() (handler.RouteRegister, error) {
 	}, nil
 }
 
+// ApplyRoute https://apisix.apache.org/zh/docs/apisix/admin-api/#route
 func (h *Handler) ApplyRoute(r *gin.Engine) {
 	r.GET("/apisix/admin/routes/:id", wgin.Wraps(h.Get, wrapper.InputType(reflect.TypeOf(GetInput{}))))
 	r.GET("/apisix/admin/routes", wgin.Wraps(h.List, wrapper.InputType(reflect.TypeOf(ListInput{}))))
